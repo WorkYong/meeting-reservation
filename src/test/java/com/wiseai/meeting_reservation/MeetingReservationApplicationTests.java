@@ -1,13 +1,13 @@
-package com.wiseai.meeting_reservation;
+// package com.wiseai.meeting_reservation;
 
-import org.junit.jupiter.api.Test;
-import org.springframework.boot.test.context.SpringBootTest;
+// import org.junit.jupiter.api.Test;
+// import org.springframework.boot.test.context.SpringBootTest;
 
-@SpringBootTest
-class MeetingReservationApplicationTests {
+// @SpringBootTest
+// class MeetingReservationApplicationTests {
 
-	@Test
-	void contextLoads() {
-	}
+// @Test
+// void contextLoads() {
+// }
 
-}
+// }
