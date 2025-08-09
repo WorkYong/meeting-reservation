@@ -4,15 +4,21 @@ services:
   app:
     build:
       context: .
+      dockerfile: Dockerfile
     container_name: wiseai-meeting-reservation-app
-    ports:
-      - "8080:8080"
+    depends_on:
+      db:
+        condition: service_healthy
+      mockpay:
+        condition: service_healthy
     environment:
-      SPRING_DATASOURCE_URL: jdbc:mysql://db:3306/meetingdb?useSSL=false&serverTimezone=Asia/Seoul
+      SPRING_DATASOURCE_URL: jdbc:mysql://db:3306/wiseaimeetingreservation?allowPublicKeyRetrieval=true&useSSL=false&serverTimezone=Asia/Seoul
       SPRING_DATASOURCE_USERNAME: ${MYSQL_USER}
       SPRING_DATASOURCE_PASSWORD: ${MYSQL_PASSWORD}
-    depends_on:
-      - db
+      # 🔽 게이트웨이용 Mock 서버 베이스 URL
+      MOCKPAY_BASE_URL: http://mockpay:8081
+    ports:
+      - "8080:8080"
 
   db:
     image: mysql:8.0
@@ -27,7 +33,33 @@ services:
       MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
     volumes:
       - mysql-data:/var/lib/mysql
-      - ./db/init.sql:/docker-entrypoint-initdb.d/init.sql
+      - ./db/init:/docker-entrypoint-initdb.d:ro
+    healthcheck:
+      test:
+        [
+          "CMD-SHELL",
+          "mysqladmin ping -h 127.0.0.1 -uroot -p$${MYSQL_ROOT_PASSWORD} --silent",
+        ]
+      interval: 5s
+      timeout: 3s
+      retries: 30
+      start_period: 10s
+
+  mockpay:
+    image: wiremock/wiremock:3.6.0
+    container_name: mock-payment-server
+    command: ["--port", "8081", "--verbose"]
+    ports:
+      - "8081:8081"
+    volumes:
+      - ./mockpay/mappings:/home/wiremock/mappings:ro
+      - ./mockpay/__files:/home/wiremock/__files:ro
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://localhost:8081/__admin/mappings"]
+      interval: 5s
+      timeout: 3s
+      retries: 30
+      start_period: 5s
 
 volumes:
   mysql-data:

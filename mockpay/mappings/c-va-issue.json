@@ -1,0 +1,16 @@
+{
+  "request": {
+    "method": "POST",
+    "url": "/c/va/issue"
+  },
+  "response": {
+    "status": 200,
+    "jsonBody": {
+      "vaNumber": "770-12-{{randomInt min=100000 max=999999}}",
+      "bank": "{{jsonPath request.body '$.bankCode'}}",
+      "status": "ISSUED",
+      "ref": "{{jsonPath request.body '$.ref'}}"
+    },
+    "transformers": ["response-template"]
+  }
+}

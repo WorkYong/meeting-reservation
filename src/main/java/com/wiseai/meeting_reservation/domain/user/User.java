@@ -20,4 +20,8 @@ public class User extends BaseEntity {
   private String email;
 
   private String phoneNumber;
+
+  private Integer level;
+
+  private String isDeleted;
 }

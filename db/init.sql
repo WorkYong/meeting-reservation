@@ -1,8 +1,9 @@
-CREATE DATABASE IF NOT EXISTS wiseaimeetingreservation CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+CREATE DATABASE IF NOT EXISTS wiseaimeetingreservation
+  CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 USE wiseaimeetingreservation;
 
-
-CREATE TABLE users (
+-- USERS
+CREATE TABLE IF NOT EXISTS users (
     id BIGINT AUTO_INCREMENT PRIMARY KEY,
     name VARCHAR(50) NOT NULL,
     email VARCHAR(100) NOT NULL UNIQUE,
@@ -12,8 +13,8 @@ CREATE TABLE users (
     deleted_at DATETIME DEFAULT NULL
 );
 
-
-CREATE TABLE meeting_rooms (
+-- MEETING ROOMS
+CREATE TABLE IF NOT EXISTS meeting_rooms (
     id BIGINT AUTO_INCREMENT PRIMARY KEY,
     name VARCHAR(100) NOT NULL UNIQUE,
     capacity INT NOT NULL,
@@ -23,51 +24,50 @@ CREATE TABLE meeting_rooms (
     deleted_at DATETIME DEFAULT NULL
 );
 
-
-CREATE TABLE reservations (
+-- RESERVATIONS
+CREATE TABLE IF NOT EXISTS reservations (
     id BIGINT AUTO_INCREMENT PRIMARY KEY,
     user_id BIGINT NOT NULL,
     meeting_room_id BIGINT NOT NULL,
     start_time DATETIME NOT NULL,
     end_time DATETIME NOT NULL,
-    status ENUM('PENDING', 'CONFIRMED', 'CANCELLED') NOT NULL,
+    status ENUM('PENDING_PAYMENT','PAID','CONFIRMED','CANCELLED') NOT NULL,
     total_price INT NOT NULL,
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
     updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     deleted_at DATETIME DEFAULT NULL,
-    UNIQUE KEY uq_reservation_unique (meeting_room_id, start_time, end_time)
+    UNIQUE KEY uq_reservation_exact (meeting_room_id, start_time, end_time),
+    INDEX idx_reservation_room_time (meeting_room_id, start_time, end_time)
 );
 
-
-CREATE TABLE payment_providers (
+CREATE TABLE IF NOT EXISTS payment_providers (
     id BIGINT AUTO_INCREMENT PRIMARY KEY,
     name VARCHAR(50) NOT NULL UNIQUE,
-    api_url VARCHAR(255) NOT NULL,
-    auth_info TEXT,
+    api_endpoint VARCHAR(255) NOT NULL,
+    auth_key TEXT NULL,
+    provider_type ENUM('CARD','SIMPLE','VIRTUAL_ACCOUNT') NOT NULL,
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
     updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     deleted_at DATETIME DEFAULT NULL
 );
 
-
-CREATE TABLE payments (
+CREATE TABLE IF NOT EXISTS payments (
     id BIGINT AUTO_INCREMENT PRIMARY KEY,
     reservation_id BIGINT NOT NULL UNIQUE,
-    payment_provider_id BIGINT NOT NULL,
-    payment_type ENUM('CARD', 'SIMPLE', 'VA') NOT NULL,
+    provider_type ENUM('CARD','SIMPLE','VIRTUAL_ACCOUNT') NOT NULL,
     amount INT NOT NULL,
-    status ENUM('PENDING', 'SUCCESS', 'FAILED', 'CANCELLED') NOT NULL,
+    status ENUM('PENDING','SUCCESS','FAILED','CANCELLED') NOT NULL,
     external_payment_id VARCHAR(100) UNIQUE,
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
     updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    deleted_at DATETIME DEFAULT NULL
+    deleted_at DATETIME DEFAULT NULL,
+    INDEX idx_payment_status (status)
 );
 
-
+-- FOREIGN KEYS
 ALTER TABLE reservations
-    ADD CONSTRAINT fk_res_user FOREIGN KEY (user_id) REFERENCES users(id),
-    ADD CONSTRAINT fk_res_room FOREIGN KEY (meeting_room_id) REFERENCES meeting_rooms(id);
+    ADD CONSTRAINT fk_res_user  FOREIGN KEY (user_id) REFERENCES users(id),
+    ADD CONSTRAINT fk_res_room  FOREIGN KEY (meeting_room_id) REFERENCES meeting_rooms(id);
 
 ALTER TABLE payments
-    ADD CONSTRAINT fk_pay_reservation FOREIGN KEY (reservation_id) REFERENCES reservations(id),
-    ADD CONSTRAINT fk_pay_provider FOREIGN KEY (payment_provider_id) REFERENCES payment_providers(id);
+    ADD CONSTRAINT fk_pay_reservation FOREIGN KEY (reservation_id) REFERENCES reservations(id);

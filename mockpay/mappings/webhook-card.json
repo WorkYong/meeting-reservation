@@ -1,0 +1,12 @@
+{
+  "request": { "method": "POST", "url": "/webhook/a/card" },
+  "response": {
+    "status": 200,
+    "jsonBody": {
+      "txid": "{{jsonPath request.body '$.txid'}}",
+      "result": "CANCELLED",
+      "reason": "user cancelled"
+    },
+    "transformers": ["response-template"]
+  }
+}

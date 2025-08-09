@@ -16,17 +16,44 @@ public class Payment extends BaseEntity {
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Long id;
 
+  // reservations.reservation_id UNIQUE 설계 → @OneToOne
+  @OneToOne(optional = false)
+  @JoinColumn(name = "reservation_id", nullable = false, unique = true)
+  private Reservation reservation;
+
   @Enumerated(EnumType.STRING)
+  @Column(name = "provider_type", nullable = false, length = 30)
   private PaymentProviderType providerType;
 
-  @Enumerated(EnumType.STRING)
-  private PaymentStatus status;
-
+  @Column(nullable = false)
   private Integer amount;
 
+  @Enumerated(EnumType.STRING)
+  @Column(nullable = false, length = 30)
+  private PaymentStatus status;
+
+  @Column(name = "external_payment_id", unique = true, length = 100)
   private String externalPaymentId;
 
-  @OneToOne
-  @JoinColumn(name = "reservation_id")
-  private Reservation reservation;
+  public static Payment create(Reservation r, PaymentProviderType provider, int amount) {
+    Payment p = new Payment();
+    p.reservation = r;
+    p.providerType = provider;
+    p.amount = amount;
+    p.status = PaymentStatus.PENDING;
+    return p;
+  }
+
+  public void success(String externalId) {
+    this.status = PaymentStatus.SUCCESS;
+    this.externalPaymentId = externalId;
+  }
+
+  public void fail() {
+    this.status = PaymentStatus.FAILED;
+  }
+
+  public void cancel() {
+    this.status = PaymentStatus.CANCELLED;
+  }
 }

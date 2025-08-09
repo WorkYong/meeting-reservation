@@ -1,0 +1,12 @@
+{
+  "request": { "method": "POST", "url": "/webhook/c/va" },
+  "response": {
+    "status": 200,
+    "jsonBody": {
+      "va": "{{jsonPath request.body '$.va'}}",
+      "event": "PAID",
+      "external_payment_id": "{{jsonPath request.body '$.external_payment_id'}}"
+    },
+    "transformers": ["response-template"]
+  }
+}

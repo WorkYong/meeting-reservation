@@ -1,0 +1,14 @@
+{
+  "request": { "method": "POST", "url": "/webhook/b/simple" },
+  "response": {
+    "status": 200,
+    "jsonBody": {
+      "payment": {
+        "id": "{{jsonPath request.body '$.payment.id'}}",
+        "status": "OK"
+      },
+      "message": "noted"
+    },
+    "transformers": ["response-template"]
+  }
+}

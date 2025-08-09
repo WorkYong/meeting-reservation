@@ -1,0 +1,15 @@
+{
+  "request": {
+    "method": "POST",
+    "url": "/a/card/pay"
+  },
+  "response": {
+    "status": 200,
+    "jsonBody": {
+      "transId": "A-{{randomValue type='UUID'}}",
+      "approved": true,
+      "message": "APPROVED"
+    },
+    "transformers": ["response-template"]
+  }
+}

@@ -1,0 +1,17 @@
+{
+  "request": {
+    "method": "POST",
+    "url": "/b/simple/pay"
+  },
+  "response": {
+    "status": 200,
+    "jsonBody": {
+      "payment": {
+        "id": "B-{{randomValue type='UUID'}}",
+        "status": "OK"
+      },
+      "userRef": "{{jsonPath request.body '$.simpleUserId'}}"
+    },
+    "transformers": ["response-template"]
+  }
+}
