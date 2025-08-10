@@ -29,7 +29,7 @@
 ### 0) 사전 준비
 
 - git clone https://github.com/WorkYong/meeting-reservation.git
-  cd meeting-reservation
+- 프로젝트 디렉토리로 이동
 
 - Docker, Docker Compose 설치
 - 프로젝트 루트 구조:
