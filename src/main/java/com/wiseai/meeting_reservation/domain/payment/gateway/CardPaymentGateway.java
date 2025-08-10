@@ -6,6 +6,7 @@ import com.wiseai.meeting_reservation.domain.payment.PaymentStatus;
 import java.util.Map;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
@@ -35,7 +36,7 @@ public class CardPaymentGateway implements PaymentGateway {
     }
     var body = res.getBody();
     if (Boolean.TRUE.equals(body.approved))
-      return PaymentResult.success(body.transId);
+      return PaymentResult.success(body.txid);
     return PaymentResult.failed(body.message);
   }
 
@@ -47,21 +48,22 @@ public class CardPaymentGateway implements PaymentGateway {
       case "APPROVED" -> PaymentResult.success(txid);
       case "DECLINED" -> PaymentResult.failed(String.valueOf(body.get("reason")));
       case "CANCELLED" -> PaymentResult.cancelled(String.valueOf(body.get("reason")));
-      default -> new PaymentResult(PaymentStatus.PENDING, null, "unknown");
+      default -> new PaymentResult(PaymentStatus.PENDING, txid, "unknown");
     };
   }
 
   @JsonIgnoreProperties(ignoreUnknown = true)
   public static class CardRes {
-    public String transId;
+    @JsonProperty("txid")
+    public String txid;
     public Boolean approved;
     public String message;
 
     public CardRes() {
     }
 
-    public CardRes(String transId, Boolean approved, String message) {
-      this.transId = transId;
+    public CardRes(String txid, Boolean approved, String message) {
+      this.txid = txid;
       this.approved = approved;
       this.message = message;
     }

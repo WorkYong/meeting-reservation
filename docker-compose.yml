@@ -55,11 +55,15 @@ services:
       - ./mockpay/mappings:/home/wiremock/mappings:ro
       - ./mockpay/__files:/home/wiremock/__files:ro
     healthcheck:
-      test: ["CMD", "wget", "-qO-", "http://localhost:8081/__admin/mappings"]
+      test:
+        [
+          "CMD-SHELL",
+          "wget -qO- http://localhost:8081/__admin >/dev/null 2>&1 || exit 1",
+        ]
       interval: 5s
       timeout: 3s
       retries: 30
-      start_period: 5s
+      start_period: 20s
 
 volumes:
   mysql-data:

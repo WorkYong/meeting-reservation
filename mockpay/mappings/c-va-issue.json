@@ -1,16 +1,13 @@
 {
-  "request": {
-    "method": "POST",
-    "url": "/c/va/issue"
-  },
+  "request": { "method": "POST", "url": "/c/va/issue" },
   "response": {
     "status": 200,
+    "headers": { "Content-Type": "application/json" },
     "jsonBody": {
-      "vaNumber": "770-12-{{randomInt min=100000 max=999999}}",
-      "bank": "{{jsonPath request.body '$.bankCode'}}",
+      "account": "770-12-123456",
+      "bank": "HANA",
       "status": "ISSUED",
-      "ref": "{{jsonPath request.body '$.ref'}}"
-    },
-    "transformers": ["response-template"]
+      "ref": "R-1"
+    }
   }
 }

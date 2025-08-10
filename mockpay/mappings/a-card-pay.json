@@ -1,12 +1,10 @@
 {
-  "request": {
-    "method": "POST",
-    "url": "/a/card/pay"
-  },
+  "request": { "method": "POST", "url": "/a/card/pay" },
   "response": {
     "status": 200,
+    "headers": { "Content-Type": "application/json" },
     "jsonBody": {
-      "transId": "A-{{randomValue type='UUID'}}",
+      "txid": "A-{{randomValue type='UUID'}}",
       "approved": true,
       "message": "APPROVED"
     },
